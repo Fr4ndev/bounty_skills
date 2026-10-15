@@ -1,0 +1,75 @@
+{
+  "name": "bounty_skills",
+  "version": "1.0.0",
+  "description": "Skill registry brutal para pentesting, hacking y bug bounty. El agente consulta este archivo para decidir qué skill usar según el target y las tools instaladas.",
+  "last_updated": "2026-10-15",
+  "total_skills": 13,
+  "stages": ["recon", "attack", "exploits", "redteam", "report"],
+  "categories": {
+    "recon": [
+      "subdomain-enum",
+      "osint-spiderfoot",
+      "wayback-dorking",
+      "api-key-hunter",
+      "certstream-crtmon"
+    ],
+    "attack": [
+      "loxs-scanner",
+      "sqli-hunting",
+      "xss-hunting",
+      "lfi-rfi",
+      "ssrf-crlf",
+      "403-bypass",
+      "api-swagger-fuzz"
+    ],
+    "exploits": ["pdf-exploits"],
+    "redteam": ["llm-jailbreak-godmode"],
+    "report": ["bug-bounty-report"]
+  },
+  "bundled_tools": {
+    "loxs": {"path": "tools/loxs/loxs.py", "type": "python", "desc": "LFI/OR/XSS/SQLi/CRLF scanner", "install": "pip install -r tools/loxs/requirements.txt"},
+    "osint-scripts": {"path": "tools/scripts/", "type": "bash/python", "desc": "wayback, alienvault, virustotal, urlscan, dorking, naabu→map, punycode, CORS PoC, lostfuzzer"},
+    "swagger-assets": {"path": "tools/swagger/", "type": "wordlist/payload", "desc": "API routes wordlist + login/XSS JSON PoCs"},
+    "pdf-exploits": {"path": "tools/pdf-exploits/", "type": "poc", "desc": "PDF.js JS exec (CVE-2024-4367), cookie theft, domain popup"},
+    "api-key-hunter": {"path": "tools/api-key-hunter/", "type": "python", "desc": "Gemini + Google API key hunters"},
+    "crtmon": {"path": "tools/crtmon/", "type": "go", "desc": "certstream monitor", "install": "cd tools/crtmon && go build -o crtmon ."},
+    "spiderfoot": {"path": "external:smicallef/spiderfoot", "type": "osint", "desc": "clonar o docker run spiderfoot/spiderfoot"},
+    "godmode": {"path": "skills/redteam/llm-jailbreak-godmode/", "type": "skill", "desc": "LLM jailbreak: parseltongue, godmode, ultraplinian"}
+  },
+  "wordlists": {
+    "root": "wordlists/",
+    "count": 64,
+    "high_value": ["everything.txt", "api.txt", "params.txt", "xss.txt", "allsqli.txt", "lfi.txt", "ssrf.txt", "ssti.txt", "crlf.txt", "403_url_payloads.txt", "jwt-secrets.txt", "github-dork.txt", "juicy-paths.txt", "spring-boot.txt"]
+  },
+  "optional_external_tools": {
+    "note": "No instalados. Cuando falten, ejecutar setup/install.sh o instalarlos manualmente — cada skill indica cuáles usa.",
+    "tools": {
+      "nuclei": {"used_by": ["recon/*", "attack/*"], "install": "https://github.com/projectdiscovery/nuclei"},
+      "ffuf": {"used_by": ["api-swagger-fuzz", "loxs-scanner"], "install": "go install github.com/ffuf/ffuf/v2@latest"},
+      "subfinder": {"used_by": ["subdomain-enum"], "install": "go install github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest"},
+      "httpx": {"used_by": ["subdomain-enum"], "install": "go install github.com/projectdiscovery/httpx/cmd/httpx@latest"},
+      "dnsx": {"used_by": ["subdomain-enum"], "install": "go install github.com/projectdiscovery/dnsx/cmd/dnsx@latest"},
+      "sqlmap": {"used_by": ["sqli-hunting"], "install": "apt install sqlmap / git clone sqlmap"},
+      "nmap": {"used_by": ["recon"], "status": "INSTALLED"},
+      "feroxbuster": {"used_by": ["403-bypass", "api-swagger-fuzz"], "install": "apt/https://github.com/epi052/feroxbuster"},
+      "ngrok": {"used_by": ["xss-hunting"], "status": "INSTALLED (snap)"}
+    }
+  },
+  "registry": [
+    {"name": "subdomain-enum", "path": "skills/recon/subdomain-enum", "stage": "recon", "status": "ready", "description": "Subdomain enumeration passive+active: crt.sh, OTX, wayback, dnsx, httpx", "tools": ["curl", "dnsx", "subfinder", "httpx"], "triggers": ["subdominios", "subdomain", "surface", "attack surface", "enumerar dominios"]},
+    {"name": "osint-spiderfoot", "path": "skills/recon/osint-spiderfoot", "stage": "recon", "status": "ready", "description": "OSINT automatizado con SpiderFoot (emails, leaks, tech, hosts)", "tools": ["python3", "spiderfoot"], "triggers": ["osint", "spiderfoot", "recon pasivo", "leaks", "emails"]},
+    {"name": "wayback-dorking", "path": "skills/recon/wayback-dorking", "stage": "recon", "status": "ready", "description": "Wayback/OTX/VT/urlscan + dorking: archivos olvidados, secrets en URLs, CORS PoC", "tools": ["curl", "dorking.py", "wayback.sh", "alienvault.sh", "virustotal.sh", "urlscan.py"], "triggers": ["wayback", "archivos", "dorking", "endpoints olvidados", "backups", "secrets en url"]},
+    {"name": "api-key-hunter", "path": "skills/recon/api-key-hunter", "stage": "recon", "status": "ready", "description": "Caza de Google/Gemini/Firebase API keys filtradas", "tools": ["Gemisc.py", "keyhunt.py"], "triggers": ["api key", "apikey", "gemini", "google", "firebase", "secretos"]},
+    {"name": "certstream-crtmon", "path": "skills/recon/certstream-crtmon", "stage": "recon", "status": "ready", "description": "Monitor de Certificate Transparency en vivo", "tools": ["crtmon", "curl"], "triggers": ["certificados", "certstream", "monitor", "certs nuevos"]},
+    {"name": "loxs-scanner", "path": "skills/attack/loxs-scanner", "stage": "attack", "status": "needs-deps", "description": "Scanner multi-vuln: LFI, OR, XSS, SQLi, CRLF en un pass", "tools": ["loxs.py", "selenium"], "triggers": ["loxs", "scanner", "scan masivo", "multi vulnerabilidad"]},
+    {"name": "sqli-hunting", "path": "skills/attack/sqli-hunting", "stage": "attack", "status": "ready", "description": "SQLi: detección, DBMS fingerprint, WAF bypass, PoC mínimo", "tools": ["curl", "sqlmap", "loxs"], "triggers": ["sqli", "injection", "sql", "database"]},
+    {"name": "xss-hunting", "path": "skills/attack/xss-hunting", "stage": "attack", "status": "ready", "description": "XSS: sinks, polyglots, WAF bypass, escalada a cookie theft", "tools": ["curl", "loxs"], "triggers": ["xss", "cross site scripting", "javascript", "cookie theft"]},
+    {"name": "lfi-rfi", "path": "skills/attack/lfi-rfi", "stage": "attack", "status": "ready", "description": "LFI/RFI/traversal → PHP wrappers → log poisoning → RCE", "tools": ["curl", "loxs"], "triggers": ["lfi", "rfi", "traversal", "path", "inclusion"]},
+    {"name": "ssrf-crlf", "path": "skills/attack/ssrf-crlf", "stage": "attack", "status": "ready", "description": "SSRF (metadata cloud, internals) + CRLF (header injection, cache poisoning)", "tools": ["curl", "loxs"], "triggers": ["ssrf", "crlf", "metadata", "169.254", "header injection"]},
+    {"name": "403-bypass", "path": "skills/attack/403-bypass", "stage": "attack", "status": "ready", "description": "Bypass 401/403/404: path confusion, verb tampering, headers", "tools": ["curl", "lostfuzzer.sh"], "triggers": ["403", "401", "forbidden", "bypass", "access control"]},
+    {"name": "api-swagger-fuzz", "path": "skills/attack/api-swagger-fuzz", "stage": "attack", "status": "ready", "description": "API testing: swagger discovery, IDOR, JWT, mass assignment, GraphQL", "tools": ["curl", "ffuf", "jq"], "triggers": ["api", "swagger", "openapi", "graphql", "jwt", "idor"]},
+    {"name": "pdf-exploits", "path": "skills/exploits/pdf-exploits", "stage": "exploits", "status": "ready", "description": "PDF.js JS execution (CVE-2024-4367), cookie theft via PDF", "tools": ["pypdf"], "triggers": ["pdf", "pdfjs", "cve-2024-4367", "expedientes", "facturas"]},
+    {"name": "llm-jailbreak-godmode", "path": "skills/redteam/llm-jailbreak-godmode", "stage": "redteam", "status": "ready", "description": "LLM red-teaming: GODMODE, Parseltongue (33 técnicas), ULTRAPLINIAN multi-model race", "tools": ["python3"], "triggers": ["jailbreak", "godmode", "redteam llm", "uncensor", "parseltongue"]},
+    {"name": "bug-bounty-report", "path": "skills/report/bug-bounty-report", "stage": "report", "status": "ready", "description": "Redactar reportes que pagan: estructura, impacto business, CVSS, triage", "tools": [], "triggers": ["reporte", "report", "triage", "hackerone", "writeup", "bounty"]}
+  ]
+}

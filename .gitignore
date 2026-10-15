@@ -1,0 +1,25 @@
+# OS
+.DS_Store
+Thumbs.db
+*.pyc
+__pycache__/
+*.egg-info/
+
+# Outputs de scans / datos sensibles
+recon/
+*.har
+cookies.json
+auth.json
+requests*.http
+burp/
+
+# Secrets — nunca commitear
+.env
+*.key
+*api_key*
+!tools/**/README.md
+
+# Build artifacts
+tools/crtmon/crtmon
+tools/loxs/*.html
+/tmp/
